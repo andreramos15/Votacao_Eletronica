@@ -16,32 +16,27 @@ import static javax.management.Query.value;
 public class Vote {
     
    
-    int numeroCC;
+    String numeroCC;
     String selectedP;
     int dificulty;
 
-    public Vote( int numeroCC, String selectedP, int dificulty) {
-       
-        this.numeroCC = numeroCC;
-        this.selectedP = selectedP;
-        this.dificulty = dificulty;
+    public Vote( String numeroCC, String selectedP) {
+       this(numeroCC + " " + selectedP);
+        
     }
 
     public Vote(String line){
         String elems[] = line.split(" ");
-        setnumeroCC(Integer.valueOf(elems[1]));
-        setSelectedP(elems[2]);
+        setnumeroCC(elems[0]);
+        setSelectedP(elems[1]);
     }
 
-    public Vote(String text, Integer valueOf) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
-    public int getnumeroCC() {
+    public String getnumeroCC() {
         return numeroCC;
     }
 
-    public final void setnumeroCC(int numeroCC) {
+    public final void setnumeroCC(String numeroCC) {
         this.numeroCC = numeroCC;
     }
 

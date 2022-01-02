@@ -7,7 +7,6 @@ package VE.core;
 
 import Security.Security;
 import Security.SecurityUtils;
-import Security.TextUtils;
 import java.io.IOException;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -29,25 +28,35 @@ public class Block {
     String data; // block data
     long timestamp; // time o block validation
     String miner; // miner name
-    String hash;// block hash ( previous + data + nonce)
-    String previous;// link to previous
-    int nounce;// solution of block 
+    protected String hash;// block hash ( previous + data + nonce)
+    protected String previous;// link to previous
+    protected long nounce;// solution of block 
+    protected int dificulty; // number of  zeros
 
 
     // construtor de forma a construir os blocos
 
-    public Block(String previous, String data) throws Exception {
+    public Block(String previous, String data, int dificulty) throws Exception {
         this.previous = previous;
         this.data = data;
+        this.dificulty = dificulty;
         this.hash = "";
         this.nounce = 0;
         this.timestamp = 0;
         this.miner = "unknown";
     }
-    
-    @Override
-    public String toString() {
-        return "["+previous+"]" + data + "\n"+ "["+hash+"]" + nounce + miner;
+    public void setSolution(long solution, String miner){
+        this.nounce = solution;
+        this.hash = getHash(getMessage(), nounce);
+        timestamp = new Date().getTime();
+        this.miner = miner;
+    }
+    public void startMine() {
+        this.nounce = 0;
+        while(!getHash(getMessage(), nounce).startsWith("000")){
+             this.nounce ++;
+        }
+        setSolution(this.nounce,"eu");
     }
     
     // este método é o que calcula os links
@@ -60,53 +69,49 @@ public class Block {
     }
 
     // implementar o toString do bloco para que possa aparecer uma string
-    
-       public String getPrevious() {
-        return previous;
-    }
-
-    public void setPrevious(String previous) {
-        this.previous = previous;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public int getNounce() {
-        return nounce;
-    }
-
-    public void setNounce(int nounce) {
-        this.nounce = nounce;
+    public String toString() {
+        return "Hash: " + previous + dificulty + data + hash + nounce + miner;
     }
     
-    public String getHash() {
-        return hash;
-    }
     
-    public void setHash(String myHash) {
-        this.hash = myHash;
+    /**
+     * message of the block
+     *
+     * @return
+     */
+    public String getMessage() {
+        return previous + data + dificulty;
     }
 
-    public void mine(int zeros) throws Exception{
-        String prefix = String.format("%0"+zeros+"d",0);
-        int number = 0;
-        while (true) {
-            number++;
-            String message = previous + data + number;
-            byte h[] = SecurityUtils.getHash(message.getBytes(), "SHA-256");
-            String myHash = TextUtils.BytetoBase64(h);
-             //verificar se esta correto
-            if (myHash.startsWith(prefix)) {
-                this.hash = myHash;
-                this.nounce = number;
-                break;
-            }
+   /**
+     * validates the block
+     *
+     * @return
+     */
+    public boolean isValid() {
+        return getHash(getMessage(), nounce).equals(hash);
+    }
+    
+    public static String getHash(String msg, long nounce) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return Base64.getEncoder().encodeToString(digest.digest((msg + nounce).getBytes()));
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Block.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return "ERROR";
     }
+
+    void setHash(String encodeToString) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    long getFact() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    String getSize() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

@@ -28,7 +28,6 @@ public class Ledger {
      */
     public Ledger() {
         history = new ArrayList<>();
-        history.add(new Vote("voto"));
     }
 
     public List<Vote> getHistory(){
@@ -81,7 +80,7 @@ public class Ledger {
             //partir a linha nos elementos
             String[] elem = line.split(" ");
             //fazer uma trasção com os elementos
-            Vote t = new Vote(elem[1]);
+            Vote t = new Vote(elem[0],elem[1]);
             //adicionar a transacao ao objeto
             voting.history.add(t);
         }
